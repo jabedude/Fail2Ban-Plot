@@ -6,6 +6,7 @@ import os
 import requests
 import gmplot
 import webbrowser
+from bs4 import BeautifulSoup
 
 def is_valid_file(parser, arg):
         if not os.path.exists(arg):
@@ -27,7 +28,7 @@ def map_ip(ipaddr):
 def start_browser():
         import platform
         system = platform.system()
-        if system == "darwin":
+        if system == "Darwin":
                 chrome_path = 'open -a /Applications/Google\ Chrome.app %s'
         elif system == "win32":
                 # Windows
@@ -45,10 +46,7 @@ def plot_pnts(coord_list):
         gmap.scatter(latitudes, longitudes, 'k', marker=True)
         #gmap.heatmap(latitudes, longitudes)
         gmap.draw("mymap.html")
-        chrome_path = 'open -a /Applications/Google\ Chrome.app %s'
-        # Windows
-        # chrome_path = 'C:\Program Files (x86)\Google\Chrome\Application\chrome.exe %s'
-        webbrowser.get(chrome_path).open("./mymap.html")
+        start_browser()
 
 def main():
         parser = argparse.ArgumentParser(description="input file")
