@@ -21,11 +21,15 @@ def map_ip(ipaddr):
         url = "http://freegeoip.net/json/%s" % ipaddr
         r = requests.get(url).json()
         print(r['city'],r['country_code'],r['latitude'],r['longitude'])
+        return r['latitude'], r['longitude']
 
-def plot_pnt():
+def plot_pnts(coord_list):
+        latitudes  = [coord[0] for coord in coord_list]
+        longitudes = [coord[1] for coord in coord_list]
         gmap = gmplot.GoogleMapPlotter(0,0,3)
         gmap.coloricon = "http://www.googlemapsmarkers.com/v1/%s/" 
-        gmap.scatter([32.0617], [118.7778], 'k', marker=True)
+        gmap.scatter(latitudes, longitudes, 'k', marker=True)
+        #gmap.heatmap(latitudes, longitudes)
         gmap.draw("mymap.html")
 
 def main():
@@ -35,9 +39,18 @@ def main():
 
         #print(type(args.filename))
 
-        #for line in args.filename:
-        #        map_ip(line.split()[-1])
-        plot_pnt()
+        while True:
+                try:
+                        #for line in args.filename:
+                        #        map_ip(line.split()[-1])
+                        coords = [map_ip(line.split()[-1]) for line in args.filename]
+                        for coord in coords:
+                                print(coord)
+                        plot_pnts(coords)
+                        break
+                except KeyboardInterrupt:
+                        print("Goodbye...")
+                        sys.exit(-1)
 
 if __name__ == "__main__":
         main()
