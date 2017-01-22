@@ -5,6 +5,7 @@ import argparse
 import os
 import requests
 import gmplot
+import webbrowser
 
 def is_valid_file(parser, arg):
         if not os.path.exists(arg):
@@ -23,6 +24,19 @@ def map_ip(ipaddr):
         print(r['city'],r['country_code'],r['latitude'],r['longitude'])
         return r['latitude'], r['longitude']
 
+def start_browser():
+        import platform
+        system = platform.system()
+        if system == "darwin":
+                chrome_path = 'open -a /Applications/Google\ Chrome.app %s'
+        elif system == "win32":
+                # Windows
+                chrome_path = 'C:\Program Files (x86)\Google\Chrome\Application\chrome.exe %s'
+        else:
+                print("Please open ./mymap.html in your favorite browser!")
+                return None
+        webbrowser.get(chrome_path).open("./mymap.html")
+
 def plot_pnts(coord_list):
         latitudes  = [coord[0] for coord in coord_list]
         longitudes = [coord[1] for coord in coord_list]
@@ -31,18 +45,20 @@ def plot_pnts(coord_list):
         gmap.scatter(latitudes, longitudes, 'k', marker=True)
         #gmap.heatmap(latitudes, longitudes)
         gmap.draw("mymap.html")
+        chrome_path = 'open -a /Applications/Google\ Chrome.app %s'
+        # Windows
+        # chrome_path = 'C:\Program Files (x86)\Google\Chrome\Application\chrome.exe %s'
+        webbrowser.get(chrome_path).open("./mymap.html")
 
 def main():
         parser = argparse.ArgumentParser(description="input file")
-        parser.add_argument("-i", dest="filename", required=True, help="The log file to be mapped", metavar="FILE", type=lambda x:is_valid_file(parser, x))
+        parser.add_argument("-i", dest="filename", required=True, 
+                            help="The log file to be mapped", metavar="FILE",
+                            type=lambda x:is_valid_file(parser, x))
         args = parser.parse_args()
-
-        #print(type(args.filename))
 
         while True:
                 try:
-                        #for line in args.filename:
-                        #        map_ip(line.split()[-1])
                         coords = [map_ip(line.split()[-1]) for line in args.filename]
                         for coord in coords:
                                 print(coord)
