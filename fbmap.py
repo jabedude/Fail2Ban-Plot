@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import sys
+import subprocess
 import argparse
 import os
 import requests
@@ -13,6 +14,10 @@ def is_valid_file(parser, arg):
             parser.error("The file %s does not exist!" % arg)
         else:
             return open(arg, 'r')
+
+def clean_logfile(log):
+        command = "grep -iv unban {} | awk '{print $7}' | tail -n+2".format(log)
+        return subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT).stdout.readlines()
 
 def map_ip(ipaddr):
         '''
