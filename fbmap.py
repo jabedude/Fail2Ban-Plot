@@ -29,9 +29,8 @@ def clean_logfile(log):
     Function uses gnu utils to turn fail2ban.log
     to all IP addresses
     '''
-    command = "grep -iv unban {} | awk '{print $7}' | tail -n+2".format(log)
-    return subprocess.Popen(command, shell=True, stdout=subprocess.PIPE,
-                            stderr=subprocess.STDOUT).stdout.readlines()
+    command = "grep -i unban {} | awk '{{print $8}}' | sort | uniq > .new.log".format(log.name)
+    subprocess.Popen(command, shell=True)
 
 def map_ip(ipaddr):
     '''
@@ -72,7 +71,6 @@ def plot_pnts(coord_list):
     gmap.scatter(latitudes, longitudes, 'k', marker=True)
     #gmap.heatmap(latitudes, longitudes)
     gmap.draw("mymap.html")
-    start_browser()
 
 def main():
     '''
@@ -83,7 +81,13 @@ def main():
     parser.add_argument("-i", dest="filename", required=True,
                         help="The log file to be mapped", metavar="FILE",
                         type=lambda x: is_valid_file(parser, x))
+    parser.add_argument("-x", dest="clean", required=False, default=False, action='store_true',
+                        help="This option signals fbmap to clean your log file")
     args = parser.parse_args()
+
+    if args.clean:
+        clean_logfile(args.filename) 
+        args.filename = is_valid_file(parser, ".new.log")
 
     while True:
         try:
@@ -91,6 +95,7 @@ def main():
             for coord in coords:
                 print(coord)
             plot_pnts(coords)
+            start_browser()
             break
         except KeyboardInterrupt:
             print("Goodbye...")
