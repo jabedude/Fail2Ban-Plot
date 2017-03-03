@@ -8,6 +8,7 @@ import argparse
 import os
 import subprocess
 import sys
+import time
 import webbrowser
 
 from bs4 import BeautifulSoup
@@ -19,6 +20,7 @@ def is_valid_file(parser, arg):
     Helper function that checks if log file is valid
     and returns file object to main()
     '''
+    #print(parser)
     if not os.path.exists(arg):
         parser.error("The file %s does not exist!" % arg)
     else:
@@ -29,7 +31,7 @@ def clean_logfile(log):
     Function uses gnu utils to turn fail2ban.log
     to all IP addresses
     '''
-    command = "grep -i unban {} | awk '{{print $8}}' | sort | uniq > .new.log".format(log.name)
+    command = "grep -i unban {} | awk '{{print $8}}' | sort | uniq > new.log".format(log.name)
     subprocess.Popen(command, shell=True)
 
 def map_ip(ipaddr):
@@ -87,7 +89,8 @@ def main():
 
     if args.clean:
         clean_logfile(args.filename) 
-        args.filename = is_valid_file(parser, ".new.log")
+        time.sleep(2)  # Apparently is_valid_file() needs a second to work correctly...
+        args.filename = is_valid_file(parser, "new.log")
 
     while True:
         try:
@@ -96,6 +99,8 @@ def main():
                 print(coord)
             plot_pnts(coords)
             start_browser()
+            delete = "rm -f new.log"
+            subprocess.Popen(delete, shell=True)
             break
         except KeyboardInterrupt:
             print("Goodbye...")
