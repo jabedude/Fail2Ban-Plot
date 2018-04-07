@@ -20,7 +20,6 @@ def is_valid_file(parser, arg):
     Helper function that checks if log file is valid
     and returns file object to main()
     '''
-    #print(parser)
     if not os.path.exists(arg):
         parser.error("The file %s does not exist!" % arg)
     else:
@@ -36,9 +35,7 @@ def clean_logfile(log):
 
 def map_ip(ipaddr):
     '''
-    url = "https://ipinfo.io/%s/json" % ipaddr
-    r = requests.get(url).json()
-    print(r['city'],r['country'],r['loc'])
+    Function maps IP address to lat, long tuple
     '''
     url = "http://freegeoip.net/json/%s" % ipaddr
     req = requests.get(url).json()
@@ -58,7 +55,7 @@ def start_browser():
         chrome_path = r'C:\Program Files (x86)\Google\Chrome\Application\chrome.exe %s'
     else:
         print("Please open ./mymap.html in your favorite browser!")
-        return None
+        return
     webbrowser.get(chrome_path).open("./mymap.html")
 
 def plot_pnts(coord_list):
